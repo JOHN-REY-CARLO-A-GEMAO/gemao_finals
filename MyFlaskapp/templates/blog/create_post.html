@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Create Blog Post{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-white py-3">
+                <h3 class="mb-0">Create New Blog Post</h3>
+                <small>Write and publish a new blog post</small>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('blog.create_post') }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!-- Title Field -->
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required 
+                                       placeholder="Enter blog post title">
+                            </div>
+
+                            <!-- Content Field -->
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Content <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="content" name="content" rows="15" required 
+                                          placeholder="Write your blog post content here..."></textarea>
+                            </div>
+
+                            <!-- Tags Field -->
+                            <div class="mb-3">
+                                <label for="tags" class="form-label">Tags</label>
+                                <input type="text" class="form-control" id="tags" name="tags" 
+                                       placeholder="Enter tags separated by commas (e.g., naruto, tutorial, jutsu)">
+                                <small class="text-muted">Separate multiple tags with commas</small>
+                            </div>
+
+                            <!-- Category Field -->
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="General" {% if post and post.category == 'General' %}selected{% endif %}>General</option>
+                                    <option value="Updates" {% if post and post.category == 'Updates' %}selected{% endif %}>Updates</option>
+                                    <option value="Announcements" {% if post and post.category == 'Announcements' %}selected{% endif %}>Announcements</option>
+                                </select>
+                                <small class="text-muted">Select the category for your blog post</small>
+                            </div>
+
+                            <!-- Featured Image Field -->
+                            <div class="mb-3">
+                                <label for="featured_image" class="form-label">Featured Image URL</label>
+                                <input type="url" class="form-control" id="featured_image" name="featured_image" 
+                                       placeholder="https://example.com/image.jpg">
+                                <small class="text-muted">Optional: URL to a featured image for the blog post</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <!-- Publishing Options -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Publishing Options</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if user_role == 'admin' %}
+                                    <!-- Status Field (Admin only) -->
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select class="form-select" id="status" name="status">
+                                            <option value="draft">Draft</option>
+                                            <option value="published">Published</option>
+                                        </select>
+                                        <small class="text-muted">
+                                            Draft: Save but don't publish<br>
+                                            Published: Publish immediately
+                                        </small>
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> Your post will be submitted for admin approval
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Submit Buttons -->
+                                    <div class="d-grid gap-2">
+                                        {% if user_role == 'admin' %}
+                                        <button type="submit" class="btn btn-outline-secondary">
+                                            <i class="fas fa-save"></i> Save as Draft
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Publish Post
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Submit for Approval
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ url_for('blog.index') }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-list"></i> View All Posts
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple character counter for content -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contentTextarea = document.getElementById('content');
+    if (contentTextarea) {
+        // Add character counter
+        const counter = document.createElement('div');
+        counter.className = 'text-muted small mt-1';
+        counter.style.textAlign = 'right';
+        contentTextarea.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            counter.textContent = `${contentTextarea.value.length} characters`;
+        }
+        
+        contentTextarea.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+});
+</script>
+{% endblock %}

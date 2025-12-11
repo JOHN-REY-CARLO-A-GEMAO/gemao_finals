@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Games{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Games</h1>
+    <p>Welcome to the games section! Choose a game to play.</p>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ninja Games</h5>
+                    <p class="card-text">Play various ninja-themed games.</p>
+                    <a href="{{ url_for('games.games_home') }}" class="btn btn-primary">Play Games</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

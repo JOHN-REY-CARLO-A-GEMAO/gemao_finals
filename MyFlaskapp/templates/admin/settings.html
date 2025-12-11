@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-white py-3">
+                <h3 class="mb-0">System Settings</h3>
+                <small>Configure system-wide settings</small>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Registration Settings</h5>
+                            <div class="mb-3">
+                                <label for="registration_enabled" class="form-label">Registration Enabled</label>
+                                <select class="form-select" id="registration_enabled" name="registration_enabled">
+                                    <option value="true" {% if settings.registration_enabled == 'true' %}selected{% endif %}>Yes</option>
+                                    <option value="false" {% if settings.registration_enabled == 'false' %}selected{% endif %}>No</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="auto_approve_users" class="form-label">Auto-approve Users</label>
+                                <select class="form-select" id="auto_approve_users" name="auto_approve_users">
+                                    <option value="true" {% if settings.auto_approve_users == 'true' %}selected{% endif %}>Yes</option>
+                                    <option value="false" {% if settings.auto_approve_users == 'false' %}selected{% endif %}>No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>OTP Settings</h5>
+                            <div class="mb-3">
+                                <label for="otp_expiry_minutes" class="form-label">OTP Expiry (minutes)</label>
+                                <input type="number" class="form-control" id="otp_expiry_minutes" name="otp_expiry_minutes" value="{{ settings.otp_expiry_minutes or 10 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="otp_length" class="form-label">OTP Length</label>
+                                <input type="number" class="form-control" id="otp_length" name="otp_length" value="{{ settings.otp_length or 6 }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Content Settings</h5>
+                            <div class="mb-3">
+                                <label for="auto_approve_comments" class="form-label">Auto-approve Comments</label>
+                                <select class="form-select" id="auto_approve_comments" name="auto_approve_comments">
+                                    <option value="true" {% if settings.auto_approve_comments == 'true' %}selected{% endif %}>Yes</option>
+                                    <option value="false" {% if settings.auto_approve_comments == 'false' %}selected{% endif %}>No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Security Settings</h5>
+                            <div class="mb-3">
+                                <label for="max_login_attempts" class="form-label">Max Login Attempts</label>
+                                <input type="number" class="form-control" id="max_login_attempts" name="max_login_attempts" value="{{ settings.max_login_attempts or 5 }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="session_timeout_minutes" class="form-label">Session Timeout (minutes)</label>
+                                <input type="number" class="form-control" id="session_timeout_minutes" name="session_timeout_minutes" value="{{ settings.session_timeout_minutes or 30 }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

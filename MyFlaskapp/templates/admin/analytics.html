@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics & Reports{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-white py-3">
+                <h3 class="mb-0">Analytics & Reports</h3>
+                <small>System performance and usage metrics</small>
+            </div>
+            <div class="card-body">
+                <!-- User Registration Statistics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>User Registration Trends (Last 30 Days)</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>New Users</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stat in analytics.user_registrations %}
+                                    <tr>
+                                        <td>{{ stat.date }}</td>
+                                        <td>{{ stat.count }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="2" class="text-center">No registration data available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Usage Statistics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>Game Usage Statistics</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Game</th>
+                                        <th>Access Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in analytics.game_usage %}
+                                    <tr>
+                                        <td>{{ game.game_name }}</td>
+                                        <td>{{ game.access_count }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="2" class="text-center">No game usage data available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog Engagement Metrics -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>Blog Engagement Metrics (Top 10)</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Post Title</th>
+                                        <th>Views</th>
+                                        <th>Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in analytics.blog_engagement %}
+                                    <tr>
+                                        <td>{{ post.title }}</td>
+                                        <td>{{ post.view_count }}</td>
+                                        <td>{{ post.comment_count }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">No blog engagement data available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Total Registrations</h5>
+                                <h2>{{ analytics.user_registrations | sum(attribute='count') or 0 }}</h2>
+                                <small>Last 30 days</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Total Game Access</h5>
+                                <h2>{{ analytics.game_usage | sum(attribute='access_count') or 0 }}</h2>
+                                <small>All time</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Total Blog Views</h5>
+                                <h2>{{ analytics.blog_engagement | sum(attribute='view_count') or 0 }}</h2>
+                                <small>All time</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-4">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

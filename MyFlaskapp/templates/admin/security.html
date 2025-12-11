@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Security Monitoring{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-white py-3">
+                <h3 class="mb-0">Security Monitoring</h3>
+                <small>Login attempts, sessions, and user activity tracking</small>
+            </div>
+            <div class="card-body">
+                <!-- Login Attempts Summary -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>Login Attempts (Last 24 Hours)</h4>
+                        <div class="row">
+                            {% for attempt in security.login_attempts %}
+                            <div class="col-md-6">
+                                <div class="card {% if attempt.action == 'login_success' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">{{ attempt.action.replace('_', ' ').title() }}</h5>
+                                        <h2>{{ attempt.count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="col-12">
+                                <p class="text-muted">No login attempt data available.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Sessions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>Active Sessions (Last Hour)</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Activity Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for session in security.active_sessions %}
+                                    <tr>
+                                        <td>{{ session.user_id }}</td>
+                                        <td>{{ session.activity_count }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="2" class="text-center">No active sessions data available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Activity Tracking -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>User Activity (Last 7 Days)</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Total Actions</th>
+                                        <th>Last Activity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for activity in security.user_activity %}
+                                    <tr>
+                                        <td>{{ activity.firstname }} {{ activity.lastname }}</td>
+                                        <td>{{ activity.total_actions }}</td>
+                                        <td>{{ activity.last_activity.strftime('%Y-%m-%d %H:%M:%S') if activity.last_activity else 'N/A' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">No user activity data available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Summary Cards -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Failed Logins</h5>
+                                <h2>
+                                    {% for attempt in security.login_attempts if attempt.action == 'login_failed' %}
+                                        {{ attempt.count }}
+                                    {% else %}
+                                        0
+                                    {% endfor %}
+                                </h2>
+                                <small>Last 24 hours</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Successful Logins</h5>
+                                <h2>
+                                    {% for attempt in security.login_attempts if attempt.action == 'login_success' %}
+                                        {{ attempt.count }}
+                                    {% else %}
+                                        0
+                                    {% endfor %}
+                                </h2>
+                                <small>Last 24 hours</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Active Users</h5>
+                                <h2>{{ security.active_sessions | length }}</h2>
+                                <small>Last hour</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-4">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

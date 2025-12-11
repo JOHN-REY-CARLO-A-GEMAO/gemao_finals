@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header text-white py-3">
+                <h3 class="mb-0">Welcome, {{ session.get('user_name', 'Admin') }}</h3>
+                <small>System Administration Dashboard</small>
+            </div>
+            <div class="card-body">
+                <!-- Dashboard Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Users</h5>
+                                <h2>{{ stats.total_users or 0 }}</h2>
+                                <small>{{ stats.active_users or 0 }} active</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Blog Posts</h5>
+                                <h2>{{ stats.published_posts or 0 }}</h2>
+                                <small>{{ stats.pending_comments or 0 }} pending comments</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Active Games</h5>
+                                <h2>{{ stats.active_games or 0 }}</h2>
+                                <small>{{ stats.total_game_access or 0 }} total access</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Pending Users</h5>
+                                <h2>{{ stats.pending_users or 0 }}</h2>
+                                <small>Need approval</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4>Quick Actions</h4>
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="{{ url_for('admin.users_list') }}" class="btn btn-primary me-md-2">
+                                <i class="fas fa-users"></i> Manage Users
+                            </a>
+                            <a href="{{ url_for('admin.blog_posts') }}" class="btn btn-success me-md-2">
+                                <i class="fas fa-blog"></i> Blog Posts
+                            </a>
+                            <a href="{{ url_for('admin.games_management') }}" class="btn btn-info me-md-2">
+                                <i class="fas fa-gamepad"></i> Games
+                            </a>
+                            <a href="{{ url_for('admin.analytics') }}" class="btn btn-warning me-md-2">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </a>
+                            <a href="{{ url_for('admin.security_monitoring') }}" class="btn btn-danger me-md-2">
+                                <i class="fas fa-shield-alt"></i> Security
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Management Sections -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h4>User Management</h4>
+                        <div class="list-group">
+                            <a href="{{ url_for('admin.users_list') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-users"></i> User List & Search
+                            </a>
+                            <a href="{{ url_for('admin.users_list') }}?status=pending" class="list-group-item list-group-item-action">
+                                <i class="fas fa-user-clock"></i> Pending Approvals ({{ stats.pending_users or 0 }})
+                            </a>
+                            <a href="{{ url_for('admin.activity_logs') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-history"></i> Activity Logs
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <h4>Content Management</h4>
+                        <div class="list-group">
+                            <a href="{{ url_for('admin.blog_posts') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-newspaper"></i> Blog Posts ({{ stats.total_posts or 0 }})
+                            </a>
+                            <a href="{{ url_for('admin.blog_comments') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-comments"></i> Comment Moderation ({{ stats.pending_comments or 0 }} pending)
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <h4>Game Management</h4>
+                        <div class="list-group">
+                            <a href="{{ url_for('admin.games_management') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-gamepad"></i> Game Settings ({{ stats.active_games or 0 }} active)
+                            </a>
+                            <a href="{{ url_for('admin.game_access') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-key"></i> User Access Control
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <h4>System Administration</h4>
+                        <div class="list-group">
+                            <a href="{{ url_for('admin.system_settings') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-cog"></i> System Settings
+                            </a>
+                            <a href="{{ url_for('admin.otp_management') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-mobile-alt"></i> OTP Management
+                            </a>
+                            <a href="{{ url_for('admin.analytics') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-chart-line"></i> Analytics & Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Preview -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h4>System Overview</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-primary">User Statistics</h5>
+                                        <p class="card-text">
+                                            <strong>Total:</strong> {{ stats.total_users or 0 }}<br>
+                                            <strong>Active:</strong> {{ stats.active_users or 0 }}<br>
+                                            <strong>Pending:</strong> {{ stats.pending_users or 0 }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-success">Content Statistics</h5>
+                                        <p class="card-text">
+                                            <strong>Posts:</strong> {{ stats.total_posts or 0 }}<br>
+                                            <strong>Published:</strong> {{ stats.published_posts or 0 }}<br>
+                                            <strong>Pending Comments:</strong> {{ stats.pending_comments or 0 }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-info">Game Statistics</h5>
+                                        <p class="card-text">
+                                            <strong>Active Games:</strong> {{ stats.active_games or 0 }}<br>
+                                            <strong>Total Access:</strong> {{ stats.total_game_access or 0 }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logout Button -->
+                <div class="mt-4 text-center">
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

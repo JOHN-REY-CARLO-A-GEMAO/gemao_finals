@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Blog</h1>
+    <p>Welcome to our blog! Read the latest articles and updates.</p>
+    
+    <div class="row">
+        <div class="col-md-8">
+            {% if posts %}
+                {% for post in posts %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            By {{ post.firstname }} {{ post.lastname }} (@{{ post.username }}) 
+                            on {{ post.created_at.strftime('%B %d, %Y') }}
+                        </h6>
+                        <p class="card-text">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                        {% if post.tags %}
+                        <div class="mb-2">
+                            {% for tag in post.tags.split(',') %}
+                            <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <a href="{{ url_for('blog.view_post', post_id=post.id) }}" class="btn btn-primary">Read More</a>
+                        <small class="text-muted ml-3">{{ post.comment_count }} comments</small>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Latest Blog Posts</h5>
+                        <p class="card-text">No blog posts available yet. Check back soon!</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Categories</h5>
+                    <div class="list-group">
+                        <a href="{{ url_for('blog.index') }}" class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                            <i class="fas fa-list me-2"></i>All Posts
+                            <span class="badge bg-secondary float-end">{{ posts|length }}</span>
+                        </a>
+                        {% for cat in categories %}
+                        <a href="{{ url_for('blog.index', category=cat.category) }}" class="list-group-item list-group-item-action {% if category == cat.category %}active{% endif %}">
+                            <i class="fas fa-folder me-2"></i>{{ cat.category }}
+                            <span class="badge bg-secondary float-end">{{ cat.count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

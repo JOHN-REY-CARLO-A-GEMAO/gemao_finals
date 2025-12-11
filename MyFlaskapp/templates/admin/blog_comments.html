@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Comment Moderation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-white py-3">
+                <h3 class="mb-0">Comment Moderation</h3>
+                <small>Review and moderate blog comments</small>
+            </div>
+            <div class="card-body">
+                <!-- Comments Table -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Comment</th>
+                                <th>Author</th>
+                                <th>Post</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in comments %}
+                            <tr>
+                                <td>{{ comment.id }}</td>
+                                <td>
+                                    {{ comment.comment[:100] }}{% if comment.comment|length > 100 %}...{% endif %}
+                                </td>
+                                <td>{{ comment.firstname }} {{ comment.lastname }}</td>
+                                <td>{{ comment.post_title }}</td>
+                                <td>
+                                    <span class="badge {% if comment.status == 'approved' %}bg-success{% elif comment.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {{ comment.status.title() }}
+                                    </span>
+                                </td>
+                                <td>{{ comment.created_at.strftime('%Y-%m-%d') if comment.created_at else 'N/A' }}</td>
+                                <td>
+                                    {% if comment.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for('admin.moderate_comment', comment_id=comment.id) }}" class="d-inline">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="submit" name="action" value="approved" class="btn btn-outline-success" title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button type="submit" name="action" value="rejected" class="btn btn-outline-danger" title="Reject">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted">Moderated</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center">No comments found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-3 d-flex gap-2">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="{{ url_for('admin.blog_posts') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-newspaper"></i> Manage Posts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

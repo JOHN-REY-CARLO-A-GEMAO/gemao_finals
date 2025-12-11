@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Ninja Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Welcome Header Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h3 class="mb-0">
+                    <i class="fas fa-user-ninja me-2"></i>
+                    Welcome, {{ session.get('user_name', 'User') }}!
+                </h3>
+                <small class="d-block mt-1">Your personal dashboard</small>
+            </div>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white py-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-id-card me-2"></i>
+                    User Profile
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item">
+                                <strong><i class="fas fa-user me-2"></i>Full Name:</strong>
+                                {{ session.user_info.firstname }} {{ session.user_info.lastname }}
+                            </div>
+                            <div class="list-group-item">
+                                <strong><i class="fas fa-calendar me-2"></i>Birthdate:</strong>
+                                {{ session.user_info.birthdate }}
+                            </div>
+                            <div class="list-group-item">
+                                <strong><i class="fas fa-home me-2"></i>Address:</strong>
+                                {{ session.user_info.address }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item">
+                                <strong><i class="fas fa-phone me-2"></i>Mobile Number:</strong>
+                                {{ session.user_info.mobile_number }}
+                            </div>
+                            <div class="list-group-item">
+                                <strong><i class="fas fa-envelope me-2"></i>Email:</strong>
+                                {{ session.user_info.email }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Games Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white py-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-gamepad me-2"></i>
+                    Available Games
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if dashboard_data.user_games %}
+                    <div class="row">
+                        {% for game in dashboard_data.user_games %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 border-success">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title text-success">{{ game.game_name }}</h6>
+                                        <p class="card-text small">{{ game.description or 'Challenge yourself with this ninja game!' }}</p>
+                                        <a href="{{ url_for('games.play_game', game_code=game.game_code) }}" class="btn btn-success btn-sm">
+                                            <i class="fas fa-play me-1"></i>Play Now
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No games available yet. Contact admin for access.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Posts Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white py-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-newspaper me-2"></i>
+                    Recent Blog Posts
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if dashboard_data.recent_posts %}
+                    <div class="list-group list-group-flush">
+                        {% for post in dashboard_data.recent_posts %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{{ url_for('blog.view_post', post_id=post.id) }}" class="text-decoration-none">
+                                            {{ post.title }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">{{ post.created_at.strftime('%b %d, %Y') if post.created_at else '' }}</small>
+                                </div>
+                                <p class="mb-1 small text-muted">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>{{ post.firstname }} {{ post.lastname }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('blog.index') }}" class="btn btn-info btn-sm">
+                            <i class="fas fa-arrow-right me-1"></i>View All Posts
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No blog posts available yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- User Statistics Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-white py-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Your Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-gamepad fa-2x text-success mb-2"></i>
+                                <h4 class="text-primary">{{ dashboard_data.user_stats.games_played or 0 }}</h4>
+                                <p class="card-text small">Games Available</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-pen fa-2x text-info mb-2"></i>
+                                <h4 class="text-primary">{{ dashboard_data.user_stats.posts_written or 0 }}</h4>
+                                <p class="card-text small">Posts Written</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-calendar fa-2x text-warning mb-2"></i>
+                                <h4 class="text-primary">{{ session.user_info.created_at.strftime('%b %Y') if session.user_info.created_at else 'Member' }}</h4>
+                                <p class="card-text small">Member Since</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white py-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('blog.index') }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-blog me-2"></i>View Blog
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('games.games_home') }}" class="btn btn-outline-success btn-sm w-100">
+                            <i class="fas fa-gamepad me-2"></i>All Games
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('user.profile') }}" class="btn btn-outline-info btn-sm w-100">
+                            <i class="fas fa-user-edit me-2"></i>Edit Profile
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="#" class="btn btn-outline-warning btn-sm w-100" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Actions Section -->
+        <div class="card">
+            <div class="card-header bg-danger text-white py-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Account Actions
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Ready to leave? Click below to securely logout of your account.
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-lg">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">
+                    <i class="fas fa-cog me-2"></i>Settings
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Settings functionality coming soon! You'll be able to customize your dashboard, notifications, and preferences here.
+                </div>
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <h6 class="mb-2">Dashboard Preferences</h6>
+                        <p class="text-muted small mb-0">Customize what you see on your dashboard</p>
+                    </div>
+                    <div class="list-group-item">
+                        <h6 class="mb-2">Notification Settings</h6>
+                        <p class="text-muted small mb-0">Control email and in-app notifications</p>
+                    </div>
+                    <div class="list-group-item">
+                        <h6 class="mb-2">Privacy Settings</h6>
+                        <p class="text-muted small mb-0">Manage your privacy and data preferences</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" disabled>Save Changes (Coming Soon)</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

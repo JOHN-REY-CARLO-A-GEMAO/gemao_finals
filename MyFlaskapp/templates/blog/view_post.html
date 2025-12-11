@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Blog Post -->
+            <article class="card">
+                <div class="card-body">
+                    <h1 class="card-title">{{ post.title }}</h1>
+                    <div class="text-muted mb-3">
+                        <p class="mb-1">
+                            By <strong>{{ post.firstname }} {{ post.lastname }}</strong> (@{{ post.username }})
+                        </p>
+                        <p class="mb-1">
+                            Published on {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            {% if post.updated_at != post.created_at %}
+                                <br>Updated on {{ post.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            {% endif %}
+                        </p>
+                        <p class="mb-1">
+                            <small>{{ post.view_count }} views</small>
+                        </p>
+                    </div>
+                    
+                    {% if post.tags %}
+                    <div class="mb-3">
+                        {% for tag in post.tags.split(',') %}
+                        <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="post-content">
+                        {{ post.content|safe }}
+                    </div>
+                    
+                    <!-- Post Actions -->
+                    <div class="mt-4 pt-3 border-top">
+                        {% if session.user_id and (session.user_id == post.author_id or session.user_role == 'admin') %}
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('blog.edit_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">Edit Post</a>
+                            {% if session.user_role == 'admin' %}
+                            <form method="POST" action="{{ url_for('blog.delete_post', post_id=post.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete Post</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Comments Section -->
+            <div class="mt-5">
+                <h3>Comments ({{ comments|length }})</h3>
+                
+                <!-- Add Comment Form -->
+                {% if session.user_id %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Leave a Comment</h5>
+                        <form method="POST" action="{{ url_for('blog.add_comment', post_id=post.id) }}">
+                            <div class="mb-3">
+                                <textarea name="comment" class="form-control" rows="3" placeholder="Write your comment here..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Comment</button>
+                            <small class="text-muted">Your comment will be submitted for approval.</small>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p class="text-muted">
+                            <a href="{{ url_for('auth.login') }}">Login</a> to leave a comment.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Comments List -->
+                {% if comments %}
+                    {% for comment in comments %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="card-subtitle mb-2">
+                                    <strong>{{ comment.firstname }} {{ comment.lastname }}</strong> (@{{ comment.username }})
+                                </h6>
+                                <small class="text-muted">
+                                    {{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                </small>
+                            </div>
+                            <p class="card-text">{{ comment.comment|safe }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card">
+                        <div class="card-body text-center text-muted">
+                            <p>No comments yet. Be the first to comment!</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Author Info</h5>
+                    <p>
+                        <strong>{{ post.firstname }} {{ post.lastname }}</strong><br>
+                        @{{ post.username }}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Navigation</h5>
+                    <a href="{{ url_for('blog.index') }}" class="btn btn-outline-primary btn-sm d-block mb-2">← Back to Blog</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
